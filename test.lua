@@ -5320,11 +5320,13 @@ local aa = {
             DialogButtonBorder = Color3.fromRGB(55, 55, 55),
             DialogBorder = Color3.fromRGB(50, 50, 50),
             DialogInput = Color3.fromRGB(45, 45, 45),
-            DialogInputLine = Color3.fromRGB(255, 100, 245),
+            DialogInputLine = Color3.fromRGB(255, 100, 245)
+            --[[
             Text = Color3.fromRGB(255, 100, 245),
             SubText = Color3.fromRGB(255, 121, 247),
             Hover = Color3.fromRGB(255, 100, 245),
             HoverChange = 0.04
+            ]]
         }
     end,
 }
