@@ -5285,12 +5285,10 @@ local aa = {
             DialogBorder = Color3.fromRGB(100, 70, 90),
             DialogInput = Color3.fromRGB(135, 55, 80),
             DialogInputLine = Color3.fromRGB(190, 160, 180),
-            --[[
             Text = Color3.fromRGB(240, 240, 240),
             SubText = Color3.fromRGB(170, 170, 170),
             Hover = Color3.fromRGB(200, 120, 170),
             HoverChange = 0.04
-            ]]
         }
     end,
     [54] = function()
@@ -5321,12 +5319,6 @@ local aa = {
             DialogBorder = Color3.fromRGB(50, 50, 50),
             DialogInput = Color3.fromRGB(45, 45, 45),
             DialogInputLine = Color3.fromRGB(255, 100, 245)
-            --[[
-            Text = Color3.fromRGB(255, 100, 245),
-            SubText = Color3.fromRGB(255, 121, 247),
-            Hover = Color3.fromRGB(255, 100, 245),
-            HoverChange = 0.04
-            ]]
         }
     end,
 }
