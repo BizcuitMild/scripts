@@ -543,7 +543,7 @@ return {
           ['Quality Bait Crate'] = {Price = 525, Type = 'Fish'},
           ['Coral Geode'] = {Price = 600, Type = 'Fish'},
           ['Volcanic Geode'] = {Price = 600, Type = 'Fish'},
-     }
+     },
      Rods = {
           ['Abyssal Specter Rod'] = {Price = 2000000, Dev = false, Unpurchasable = false, Passive = false, Requirements = false, From = 'nil'},
           ['Abyssal Spinecaster'] = {Price = 1e999, Dev = true, Unpurchasable = true, Passive = false, Requirements = false, From = 'nil'},
