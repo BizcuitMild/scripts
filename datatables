@@ -536,13 +536,6 @@ return {
           ['Windset Totem'] = {Price = 2000, Type = 'Item'},
           ['Winter Cloak'] = {Price = 7500, Type = 'Item'},
           ['Witches Ingredient'] = {Price = 10000, Type = 'Item'},
-          ['Bait Crate'] = {Price = 120, Type = 'Fish'},
-          ['Carbon Crate'] = {Price = 490, Type = 'Fish'},
-          ['Common Crate'] = {Price = 128, Type = 'Fish'},
-          ['Festive Bait Crate'] = {Price = 1150, Type = 'Fish'},
-          ['Quality Bait Crate'] = {Price = 525, Type = 'Fish'},
-          ['Coral Geode'] = {Price = 600, Type = 'Fish'},
-          ['Volcanic Geode'] = {Price = 600, Type = 'Fish'},
      },
      Rods = {
           ['Abyssal Specter Rod'] = {Price = 2000000, Dev = false, Unpurchasable = false, Passive = false, Requirements = false, From = 'nil'},
