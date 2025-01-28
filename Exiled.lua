@@ -3,9 +3,9 @@ loadstring([[
 ]])();
 
 if getgenv().cuppink then warn("CupPibk Hub : Already executed!") return end
-getgenv().cuppink = false
+getgenv().cuppink = true
 
-local DevMode = true
+local DevMode = false
 
 if not game:IsLoaded() then
     game.Loaded:Wait()
@@ -158,33 +158,76 @@ do
             while Options.ItemVisual.Value == true do task.wait()
                 local CurrentCamera = Services.CurrentCamera
                 for i,v in pairs(workspace.Debris:GetChildren()) do
-                    if Options.ItemVisual.Value then 
-                        if not v:FindFirstChild('ItemESP') then
-                            local bill = Instance.new('BillboardGui',v)
-                            bill.Name = 'ItemESP'
-                            bill.ExtentsOffset = Vector3.new(0, 1, 0)
-                            bill.Size = UDim2.new(1, 200, 1, 30)
-                            bill.Adornee = v
-                            bill.AlwaysOnTop = true
-                            local name = Instance.new('TextLabel', bill)
-                            name.Font = Enum.Font.GothamBold
-                            name.TextSize = 14
-                            name.TextWrapped = true
-                            name.Size = UDim2.new(1, 0, 1, 0)
-                            name.TextYAlignment = Enum.TextYAlignment.Top
-                            name.BackgroundTransparency = 1
-                            name.TextStrokeTransparency = 0.5
-                            name.TextColor3 = Color3.fromRGB(255, 100, 245)
+                    if v:IsA("Tool") then
+                        if Options.ItemVisual.Value then 
+                            if not v:FindFirstChild('ItemESP') then
+                                local bill = Instance.new('BillboardGui',v)
+                                bill.Name = 'ItemESP'
+                                bill.ExtentsOffset = Vector3.new(0, 1, 0)
+                                bill.Size = UDim2.new(1, 200, 1, 30)
+                                bill.Adornee = v
+                                bill.AlwaysOnTop = true
+                                local name = Instance.new('TextLabel', bill)
+                                name.Font = Enum.Font.GothamBold
+                                name.TextSize = 14
+                                name.TextWrapped = true
+                                name.Size = UDim2.new(1, 0, 1, 0)
+                                name.TextYAlignment = Enum.TextYAlignment.Top
+                                name.BackgroundTransparency = 1
+                                name.TextStrokeTransparency = 0.5
+                                name.TextColor3 = Color3.fromRGB(255, 100, 245)
+                            else
+                                v['ItemESP'].TextLabel.Text = v.Name
+                            end
                         else
-                            v['ItemESP'].TextLabel.Text = v.Name
-                        end
-                    else
-                        if v:FindFirstChild('ItemESP') then
-                            v:FindFirstChild('ItemESP'):Destroy()
+                            if v:FindFirstChild('ItemESP') then
+                                v:FindFirstChild('ItemESP'):Destroy()
+                            end
                         end
                     end
                 end
             end
+        end)
+    end)
+
+    local MonterVisual = Tabs.Visuals:AddToggle("MonterVisual", {Title = "ESP Monter", Default = false })    
+    MonterVisual:OnChanged(function(Value)
+        Options.MonterVisual.Value = Value
+        spawn(function()
+            pcall(function()
+                while Options.MonterVisual.Value == true do task.wait()
+                    local CurrentCamera = Services.CurrentCamera
+                    for i,v in pairs(workspace.Debris:GetChildren()) do
+                        if v:IsA("Model") and v:FindFirstChild("Humanoid") and v:FindFirstChild("HumanoidRootPart") and v.Humanoid.Health > 0 then
+                            if Options.MonterVisual.Value then 
+                                if not v:FindFirstChild('MonterESP') then
+                                    local bill = Instance.new('BillboardGui',v)
+                                    bill.Name = 'MonterESP'
+                                    bill.ExtentsOffset = Vector3.new(0, 1, 0)
+                                    bill.Size = UDim2.new(1, 200, 1, 30)
+                                    bill.Adornee = v
+                                    bill.AlwaysOnTop = true
+                                    local name = Instance.new('TextLabel', bill)
+                                    name.Font = Enum.Font.GothamBold
+                                    name.TextSize = 14
+                                    name.TextWrapped = true
+                                    name.Size = UDim2.new(1, 0, 1, 0)
+                                    name.TextYAlignment = Enum.TextYAlignment.Top
+                                    name.BackgroundTransparency = 1
+                                    name.TextStrokeTransparency = 0.5
+                                    name.TextColor3 = Color3.fromRGB(255, 0, 0)
+                                else
+                                    v['MonterESP'].TextLabel.Text = v.Name.. "\nHealth : " .. v.Humanoid.Health
+                                end
+                            else
+                                if v:FindFirstChild('MonterESP') then
+                                    v:FindFirstChild('MonterESP'):Destroy()
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
         end)
     end)
 
@@ -195,8 +238,35 @@ do
             pcall(function()
                 while Options.MerchantVisual.Value == true do task.wait()
                     local CurrentCamera = Services.CurrentCamera
-                    for i,v in pairs(workspace.MainPath.Windmill.Merchant:GetChildren()) do
-                        if v:IsA("Model") and v.Name == "Merchant" then
+                    for i,v in pairs(workspace.MainPath:GetDescendants()) do
+                        if v:IsA("Model") and v.Name == "Merchant" and v:FindFirstChild('HumanoidRootPart') then
+                            if Options.MerchantVisual.Value then 
+                                if not v:FindFirstChild('MerchantESP') then
+                                    local bill = Instance.new('BillboardGui',v)
+                                    bill.Name = 'MerchantESP'
+                                    bill.ExtentsOffset = Vector3.new(0, 1, 0)
+                                    bill.Size = UDim2.new(1, 200, 1, 30)
+                                    bill.Adornee = v
+                                    bill.AlwaysOnTop = true
+                                    local name = Instance.new('TextLabel', bill)
+                                    name.Font = Enum.Font.GothamBold
+                                    name.TextSize = 14
+                                    name.TextWrapped = true
+                                    name.Size = UDim2.new(1, 0, 1, 0)
+                                    name.TextYAlignment = Enum.TextYAlignment.Top
+                                    name.BackgroundTransparency = 1
+                                    name.TextStrokeTransparency = 0.5
+                                    name.TextColor3 = Color3.fromRGB(0, 255, 0)
+                                else
+                                    v['MerchantESP'].TextLabel.Text = v.Name
+                                end
+                            else
+                                if v:FindFirstChild('MerchantESP') then
+                                    v:FindFirstChild('MerchantESP'):Destroy()
+                                end
+                            end
+                        end
+                        if v:IsA("Model") and v.Name == "Hunter" and v:FindFirstChild('HumanoidRootPart') then
                             if Options.MerchantVisual.Value then 
                                 if not v:FindFirstChild('MerchantESP') then
                                     local bill = Instance.new('BillboardGui',v)
@@ -229,8 +299,97 @@ do
         end)
     end)
 
+    local WandererVisual = Tabs.Visuals:AddToggle("WandererVisual", {Title = "ESP Wanderer", Default = false })    
+    WandererVisual:OnChanged(function(Value)
+        Options.WandererVisual.Value = Value
+        spawn(function()
+            pcall(function()
+                while Options.WandererVisual.Value == true do task.wait()
+                    local CurrentCamera = Services.CurrentCamera
+                    for i,v in pairs(workspace.MainPath:GetDescendants()) do
+                        if v:IsA("Model") and v.Name == "Wanderer" then
+                            if Options.WandererVisual.Value then 
+                                if not v:FindFirstChild('WandererESP') then
+                                    local bill = Instance.new('BillboardGui',v)
+                                    bill.Name = 'WandererESP'
+                                    bill.ExtentsOffset = Vector3.new(0, 1, 0)
+                                    bill.Size = UDim2.new(1, 200, 1, 30)
+                                    bill.Adornee = v
+                                    bill.AlwaysOnTop = true
+                                    local name = Instance.new('TextLabel', bill)
+                                    name.Font = Enum.Font.GothamBold
+                                    name.TextSize = 14
+                                    name.TextWrapped = true
+                                    name.Size = UDim2.new(1, 0, 1, 0)
+                                    name.TextYAlignment = Enum.TextYAlignment.Top
+                                    name.BackgroundTransparency = 1
+                                    name.TextStrokeTransparency = 0.5
+                                    name.TextColor3 = Color3.fromRGB(0, 0, 255)
+                                else
+                                    v['WandererESP'].TextLabel.Text = v.Name
+                                end
+                            else
+                                if v:FindFirstChild('WandererESP') then
+                                    v:FindFirstChild('WandererESP'):Destroy()
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
+        end)
+    end)
+
+    local FireFlyVisual = Tabs.Visuals:AddToggle("FireFlyVisual", {Title = "ESP FireFly", Default = false })    
+    FireFlyVisual:OnChanged(function(Value)
+        Options.FireFlyVisual.Value = Value
+        spawn(function()
+            pcall(function()
+                while Options.FireFlyVisual.Value == true do task.wait()
+                    local CurrentCamera = Services.CurrentCamera
+                    for i,v in pairs(workspace.Debris:GetChildren()) do
+                        if v:IsA("Model") and v.Name == "Common" and v:FindFirstChild('Common') then
+                            if Options.FireFlyVisual.Value then 
+                                if not v:FindFirstChild('FireFlyESP') then
+                                    local bill = Instance.new('BillboardGui',v)
+                                    bill.Name = 'FireFlyESP'
+                                    bill.ExtentsOffset = Vector3.new(0, 1, 0)
+                                    bill.Size = UDim2.new(1, 200, 1, 30)
+                                    bill.Adornee = v
+                                    bill.AlwaysOnTop = true
+                                    local name = Instance.new('TextLabel', bill)
+                                    name.Font = Enum.Font.GothamBold
+                                    name.TextSize = 14
+                                    name.TextWrapped = true
+                                    name.Size = UDim2.new(1, 0, 1, 0)
+                                    name.TextYAlignment = Enum.TextYAlignment.Top
+                                    name.BackgroundTransparency = 1
+                                    name.TextStrokeTransparency = 0.5
+                                    name.TextColor3 = Color3.fromRGB(0, 0, 255)
+                                else
+                                    v['FireFlyESP'].TextLabel.Text = "FireFly"
+                                end
+                            else
+                                if v:FindFirstChild('FireFlyESP') then
+                                    v:FindFirstChild('FireFlyESP'):Destroy()
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
+        end)
+    end)
+
     -- // Teleports Tab // --
     local section = Tabs.Teleports:AddSection("Position Teleport")
+    local TPWagon = Tabs.Teleports:AddButton({
+        Title = "Wagon Teleport",
+        Callback = function()
+            PlayerData.HumanoidRootPart:PivotTo(workspace.Wagon:GetPivot() + Vector3.new(1, 10, 1))
+        end
+    })
+
     local SelectPosition = Tabs.Teleports:AddParagraph({
         Title = "Position : N/A"
     })
@@ -295,6 +454,7 @@ do
             TeleportToPlayer:SetValue(nil)
         end
     end)
+
     local RefreshPlayer = Tabs.Teleports:AddButton({
         Title = "Refresh Player List",
         Callback = function()
@@ -342,25 +502,6 @@ do
             
         end
     end)
-
-    -- // // // Noclip Stepped // // // --
-    --[[
-    NoclipConnection = Services.RunService.Stepped:Connect(function()
-        if Noclip == true then
-            if PlayerData.LocalCharacter ~= nil then
-                for i, v in pairs(PlayerData.LocalCharacter:GetDescendants()) do
-                    if v:IsA("BasePart") and v.CanCollide == true then
-                        v.CanCollide = false
-                    end
-                end
-            end
-        end
-    end)
-    local ToggleNoclip = Tabs.Misc:AddToggle("ToggleNoclip", {Title = "Noclip", Default = false })
-    ToggleNoclip:OnChanged(function()
-        Noclip = Options.ToggleNoclip.Value
-    end)
-    ]]
 
     local flying = false
     local bodyVelocity, bodyGyro
