@@ -1,7 +1,7 @@
 if getgenv().cuppink then warn("CupPibk Hub : Already executed!") return end
-getgenv().cuppink = true
+getgenv().cuppink = false
 
-local DevMode = false
+local DevMode = true
 
 if not game:IsLoaded() then
     game.Loaded:Wait()
@@ -125,57 +125,11 @@ local Window = Fluent:CreateWindow({
 -- // // // Tabs Gui // // // --
 local Tabs = { -- https://lucide.dev/icons/
     Home = Window:AddTab({ Title = "Home", Icon = "home" }),
-    Main = Window:AddTab({ Title = "Main", Icon = "list" }),
     Visuals = Window:AddTab({ Title = "Visuals", Icon = "eye" }),
     Teleports = Window:AddTab({ Title = "Teleports", Icon = "map-pin" }),
     Misc = Window:AddTab({ Title = "Misc", Icon = "file-text" }),
 }
 local Options = Fluent.Options
-
-function CollectCandyCane()
-    local curPosCollectCandyCane = PlayerData.HumanoidRootPart.CFrame
-    isMEfHStop = true
-    for i, v in pairs(workspace.Debris:GetDescendants()) do
-        if v:IsA("Model") and v:FindFirstChild("Candy Cane") then
-            for _, prompt in pairs(v:GetDescendants()) do
-                if prompt:IsA("ProximityPrompt") then
-                    PlayerData.HumanoidRootPart.CFrame = v.CFrame
-                    PlayerData.HumanoidRootPart.Anchored = true
-                    prompt:InputHoldBegin()
-                    task.wait(0.06)
-                    prompt:InputHoldEnd()
-                    PlayerData.HumanoidRootPart.Anchored = false 
-                    task.wait(0.8)
-                    PlayerData.HumanoidRootPart.CFrame = curPosCollectCandyCane
-                    isMEfHStop = false
-                    break
-                end
-            end
-        end
-    end
-end
-
-function CollectTreasure()
-    local curPosCollectTreasure = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
-    isMEfHStop = true
-    for i, v in pairs(workspace.Debris:GetDescendants()) do
-        if v:IsA("MeshPart") and v.Name == "Handle" and v:FindFirstChild("ProximityPrompt") then
-            PlayerData.HumanoidRootPart.CFrame = v.CFrame
-            PlayerData.HumanoidRootPart.Anchored = true
-            task.wait(0.5)
-            Services.VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
-            task.wait(0.06)
-            Services.VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
-            PlayerData.HumanoidRootPart.Anchored = false 
-            task.wait(0.8)
-            PlayerData.HumanoidRootPart.CFrame = curPosCollectTreasure
-            isMEfHStop = false
-            break
-        end
-    end
-end
-
--- workspace.Debris:GetChildren()[59].Handle.ProximityPrompt
 
 do
     --- << Home Tab >> ---
@@ -190,20 +144,6 @@ do
                 Content = "Successfully copied Discord linkใ",
                 Duration = 5
             })
-        end
-    })
-
-    -- // Main Tab // --
-    --[[
-    local AutoCollectCandyCane = Tabs.Main:AddToggle("AutoCollectCandyCane", {Title = "Auto Collect CandyCane", Default = false })
-    AutoCollectCandyCane:OnChanged(function(Value)
-        Options.AutoCollectCandyCane.Value = Value
-    end)
-    ]]
-    Tabs.Main:AddButton({
-        Title = "Collect CandyCane",
-        Callback = function()
-            CollectTreasure()
         end
     })
 
