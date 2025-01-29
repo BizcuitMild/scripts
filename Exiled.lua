@@ -1,7 +1,3 @@
-loadstring([[
-    function LPH_NO_VIRTUALIZE(f) return f end;
-]])();
-
 if getgenv().cuppink then warn("CupPibk Hub : Already executed!") return end
 getgenv().cuppink = true
 
@@ -129,11 +125,57 @@ local Window = Fluent:CreateWindow({
 -- // // // Tabs Gui // // // --
 local Tabs = { -- https://lucide.dev/icons/
     Home = Window:AddTab({ Title = "Home", Icon = "home" }),
+    Main = Window:AddTab({ Title = "Main", Icon = "list" }),
     Visuals = Window:AddTab({ Title = "Visuals", Icon = "eye" }),
     Teleports = Window:AddTab({ Title = "Teleports", Icon = "map-pin" }),
     Misc = Window:AddTab({ Title = "Misc", Icon = "file-text" }),
 }
 local Options = Fluent.Options
+
+function CollectCandyCane()
+    local curPosCollectCandyCane = PlayerData.HumanoidRootPart.CFrame
+    isMEfHStop = true
+    for i, v in pairs(workspace.Debris:GetDescendants()) do
+        if v:IsA("Model") and v:FindFirstChild("Candy Cane") then
+            for _, prompt in pairs(v:GetDescendants()) do
+                if prompt:IsA("ProximityPrompt") then
+                    PlayerData.HumanoidRootPart.CFrame = v.CFrame
+                    PlayerData.HumanoidRootPart.Anchored = true
+                    prompt:InputHoldBegin()
+                    task.wait(0.06)
+                    prompt:InputHoldEnd()
+                    PlayerData.HumanoidRootPart.Anchored = false 
+                    task.wait(0.8)
+                    PlayerData.HumanoidRootPart.CFrame = curPosCollectCandyCane
+                    isMEfHStop = false
+                    break
+                end
+            end
+        end
+    end
+end
+
+function CollectTreasure()
+    local curPosCollectTreasure = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+    isMEfHStop = true
+    for i, v in pairs(workspace.Debris:GetDescendants()) do
+        if v:IsA("MeshPart") and v.Name == "Handle" and v:FindFirstChild("ProximityPrompt") then
+            PlayerData.HumanoidRootPart.CFrame = v.CFrame
+            PlayerData.HumanoidRootPart.Anchored = true
+            task.wait(0.5)
+            Services.VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+            task.wait(0.06)
+            Services.VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+            PlayerData.HumanoidRootPart.Anchored = false 
+            task.wait(0.8)
+            PlayerData.HumanoidRootPart.CFrame = curPosCollectTreasure
+            isMEfHStop = false
+            break
+        end
+    end
+end
+
+-- workspace.Debris:GetChildren()[59].Handle.ProximityPrompt
 
 do
     --- << Home Tab >> ---
@@ -150,7 +192,40 @@ do
             })
         end
     })
+
+    -- // Main Tab // --
+    --[[
+    local AutoCollectCandyCane = Tabs.Main:AddToggle("AutoCollectCandyCane", {Title = "Auto Collect CandyCane", Default = false })
+    AutoCollectCandyCane:OnChanged(function(Value)
+        Options.AutoCollectCandyCane.Value = Value
+    end)
+    ]]
+    Tabs.Main:AddButton({
+        Title = "Collect CandyCane",
+        Callback = function()
+            CollectTreasure()
+        end
+    })
+
     -- // Visuals Tab // --
+    local FulbrightVisual = Tabs.Visuals:AddToggle("FulbrightVisual", {Title = "Full Bright", Default = false })
+    FulbrightVisual:OnChanged(function(Value)
+        Options.FulbrightVisual.Value = Value
+        spawn(function()
+            while Options.FulbrightVisual.Value == true do task.wait()
+                if Options.FulbrightVisual.Value then
+                    game:GetService("Lighting").Ambient = Color3.fromRGB(255, 255, 255)
+                    game:GetService("Lighting").Brightness = 10
+                    game:GetService("Lighting").FoggyAtmosphere.Density = 0
+                else
+                    game:GetService("Lighting").Ambient = Color3.fromRGB(70, 70, 70)
+                    game:GetService("Lighting").Brightness = 0.5
+                    game:GetService("Lighting").FoggyAtmosphere.Density = 0.8
+                end
+            end
+        end)
+    end)
+
     local ItemVisual = Tabs.Visuals:AddToggle("ItemVisual", {Title = "ESP Item", Default = false })    
     ItemVisual:OnChanged(function(Value)
         Options.ItemVisual.Value = Value
@@ -348,7 +423,7 @@ do
                 while Options.FireFlyVisual.Value == true do task.wait()
                     local CurrentCamera = Services.CurrentCamera
                     for i,v in pairs(workspace.Debris:GetChildren()) do
-                        if v:IsA("Model") and v.Name == "Common" and v:FindFirstChild('Common') then
+                        if v:IsA("Model") and v:FindFirstChild('Common') or v:FindFirstChild('Rare') or v:FindFirstChild('Epic') then
                             if Options.FireFlyVisual.Value then 
                                 if not v:FindFirstChild('FireFlyESP') then
                                     local bill = Instance.new('BillboardGui',v)
@@ -539,7 +614,7 @@ do
             bodyGyro.CFrame = PlayerData.HumanoidRootPart.CFrame
             bodyGyro.Parent = PlayerData.HumanoidRootPart
             initialRise(PlayerData.LocalCharacter)
-            Services.RunService.RenderStepped:Connect(LPH_NO_VIRTUALIZE(function(s)
+            Services.RunService.RenderStepped:Connect(function()
                 if flying then
                     local moveDirection = PlayerData.Humanoid.MoveDirection * flySpeed
                     local camLookVector = workspace.CurrentCamera.CFrame.LookVector
@@ -563,7 +638,7 @@ do
                     local targetCFrame = CFrame.new(PlayerData.HumanoidRootPart.Position, PlayerData.HumanoidRootPart.Position + camLookVector) * tiltCFrame
                     bodyGyro.CFrame = bodyGyro.CFrame:Lerp(targetCFrame, 0.2)
                 end
-            end))
+            end)
         else
             if not flying then return end
             flying = false
