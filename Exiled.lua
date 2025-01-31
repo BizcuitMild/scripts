@@ -1,7 +1,7 @@
 if getgenv().cuppink then warn("CupPibk Hub : Already executed!") return end
-getgenv().cuppink = false
+getgenv().cuppink = true
 
-local DevMode = true
+local DevMode = false
 
 if not game:IsLoaded() then
     game.Loaded:Wait()
@@ -125,6 +125,7 @@ local Window = Fluent:CreateWindow({
 -- // // // Tabs Gui // // // --
 local Tabs = { -- https://lucide.dev/icons/
     Home = Window:AddTab({ Title = "Home", Icon = "home" }),
+    Main = Window:AddTab({ Title = "Main", Icon = "list" }),
     Visuals = Window:AddTab({ Title = "Visuals", Icon = "eye" }),
     Teleports = Window:AddTab({ Title = "Teleports", Icon = "map-pin" }),
     Misc = Window:AddTab({ Title = "Misc", Icon = "file-text" }),
@@ -147,8 +148,8 @@ do
         end
     })
 
-    -- // Visuals Tab // --
-    local FulbrightVisual = Tabs.Visuals:AddToggle("FulbrightVisual", {Title = "Full Bright", Default = false })
+    --- << Main Tab >> ---
+    local FulbrightVisual = Tabs.Main:AddToggle("FulbrightVisual", {Title = "Full Bright", Default = false })
     FulbrightVisual:OnChanged(function(Value)
         Options.FulbrightVisual.Value = Value
         spawn(function()
@@ -166,6 +167,156 @@ do
         end)
     end)
 
+    local CollectItem = Tabs.Main:AddButton({
+        Title = "Collect Item",
+        Callback = function()
+            local worldFolder = game.Workspace:FindFirstChild("Debris")
+            if not worldFolder then
+                warn("world folder not found in Workspace")
+                return
+            end
+            local oldpos = PlayerData.HumanoidRootPart.CFrame
+            local offset = Vector3.new(0, 1, 0)
+            for _, item in pairs(worldFolder:GetChildren()) do
+                if item:IsA("Tool") and item:FindFirstChild("Handle") then
+                    local ProximityPrompt = item.Handle.ProximityPrompt
+                    PlayerData.HumanoidRootPart:PivotTo(item:GetPivot() + offset)
+                    ProximityPrompt.RequiresLineOfSight = false
+                    ProximityPrompt.HoldDuration = 0
+                    task.wait(0.3)
+                    ProximityPrompt:InputHoldBegin()
+                    Services.RunService.Heartbeat:Wait(0.1)
+                    ProximityPrompt:InputHoldEnd()
+                    task.wait(0.5)
+                    PlayerData.HumanoidRootPart.CFrame = oldpos
+                end
+            end
+        end
+    })
+
+    local CollectCandy = Tabs.Main:AddButton({
+        Title = "Collect Candy Cane",
+        Callback = function()
+            local worldFolder = game.Workspace:FindFirstChild("Debris")
+            if not worldFolder then
+                warn("world folder not found in Workspace")
+                return
+            end
+            local oldpos = PlayerData.HumanoidRootPart.CFrame
+            for _, candy in pairs(worldFolder:GetChildren()) do
+                if candy:IsA("Model") and candy.Name == "Candy Cane" and candy:FindFirstChild("Handle") then
+                    local ProximityPrompt = candy.Handle.ProximityPrompt
+                    PlayerData.HumanoidRootPart:PivotTo(candy:GetPivot())
+                    ProximityPrompt.RequiresLineOfSight = false
+                    task.wait(0.3)
+                    ProximityPrompt:InputHoldBegin()
+                    Services.RunService.Heartbeat:Wait(0.1)
+                    ProximityPrompt:InputHoldEnd()
+                    task.wait(0.5)
+                    PlayerData.HumanoidRootPart.CFrame = oldpos
+                end
+            end
+        end
+    })
+
+    local CollectCandy = Tabs.Main:AddButton({
+        Title = "Collect Bag of Coins",
+        Callback = function()
+            local worldFolder = game.Workspace:FindFirstChild("Debris")
+            if not worldFolder then
+                warn("world folder not found in Workspace")
+                return
+            end
+            local oldpos = PlayerData.HumanoidRootPart.CFrame
+            for _, coins in pairs(worldFolder:GetChildren()) do
+                if coins:IsA("Model") and coins.Name == "Bag of Coins" and coins:FindFirstChild("Handle") then
+                    local ProximityPrompt = coins.Handle.ProximityPrompt
+                    PlayerData.HumanoidRootPart:PivotTo(coins:GetPivot())
+                    ProximityPrompt.RequiresLineOfSight = false
+                    task.wait(0.3)
+                    ProximityPrompt:InputHoldBegin()
+                    Services.RunService.Heartbeat:Wait(0.1)
+                    ProximityPrompt:InputHoldEnd()
+                    task.wait(0.5)
+                    PlayerData.HumanoidRootPart.CFrame = oldpos
+                end
+            end
+        end
+    })
+
+    -- // Visuals Tab // --
+    local PlayerVisual = Tabs.Visuals:AddToggle("PlayerVisual", {Title = "ESP Players", Default = false })    
+    PlayerVisual:OnChanged(function(Value)
+        Options.PlayerVisual.Value = Value
+        spawn(function()
+            if Options.PlayerVisual.Value then
+                for _, player in pairs(game:GetService('Players'):GetPlayers()) do
+                    -- Ensure the player character exists and is loaded
+                    if PlayerData.LocalCharacter and PlayerData.LocalCharacter:FindFirstChild("HumanoidRootPart") then
+                        local HumanoidRootPart = PlayerData.LocalCharacter:FindFirstChild("HumanoidRootPart")
+    
+                        -- Create ESP highlight effect
+                        local highlight = Instance.new("Highlight")
+                        highlight.Parent = character
+                        highlight.Adornee = character
+                        highlight.FillColor = Color3.fromRGB(0, 255, 0) -- Green fill for players
+                        highlight.OutlineColor = Color3.fromRGB(255, 255, 255) -- White outline
+                        highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop -- Ensure it stays visible
+                        highlight.Enabled = true
+    
+                        -- Create BillboardGui for player name tag
+                        local billboardGui = Instance.new("BillboardGui")
+                        billboardGui.Parent = HumanoidRootPart
+                        billboardGui.Adornee = HumanoidRootPart
+                        billboardGui.Size = UDim2.new(6, 0, 1.5, 0) -- Default size for visibility
+                        billboardGui.StudsOffset = Vector3.new(0, 5, 0) -- Offset above the player
+                        billboardGui.AlwaysOnTop = true
+    
+                        -- Create TextLabel for player name
+                        local textLabel = Instance.new("TextLabel")
+                        textLabel.Parent = billboardGui
+                        textLabel.Size = UDim2.new(1, 0, 1, 0)
+                        textLabel.BackgroundTransparency = 1
+                        textLabel.Text = player.Name -- Display player's name
+                        textLabel.TextColor3 = Color3.fromRGB(255, 255, 255) -- White text
+                        textLabel.TextStrokeTransparency = 0 -- Add stroke for better visibility
+                        textLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0) -- Black stroke
+                        textLabel.Font = Enum.Font.GothamBold
+                        textLabel.TextScaled = true
+    
+                        -- Adjust the BillboardGui size based on distance from camera
+                        local camera = game.Workspace.CurrentCamera
+                        local dist = (camera.CFrame.Position - PlayerData.LocalCharacter.HumanoidRootPart.Position).Magnitude
+                        local scaleFactor = math.min(15, math.max(5, dist / 50)) -- Scale the size with distance, adjust as needed
+                        billboardGui.Size = UDim2.new(scaleFactor, 0, 3, 0) -- Keep it visible even from far distances
+    
+                        -- Force visibility for far distance players
+                        highlight.OutlineTransparency = 0.5 -- Increase outline transparency for far distance
+                        highlight.FillTransparency = 0.5 -- Increase fill transparency for far distance
+                    end
+                end
+            else
+                for _, player in pairs(game:GetService('Players'):GetPlayers()) do
+                    if PlayerData.LocalCharacter and PlayerData.LocalCharacter:FindFirstChild("HumanoidRootPart") then
+                        local HumanoidRootPart = PlayerData.LocalCharacter:FindFirstChild("HumanoidRootPart")
+    
+                        -- Remove Highlight
+                        local highlight = PlayerData.LocalCharacter:FindFirstChildOfClass("Highlight")
+                        if highlight then
+                            highlight:Destroy()
+                        end
+    
+                        -- Remove BillboardGui
+                        local billboardGui = HumanoidRootPart:FindFirstChildOfClass("BillboardGui")
+                        if billboardGui then
+                            billboardGui:Destroy()
+                        end
+                    end
+                end
+            end
+        end)
+    end)
+
     local ItemVisual = Tabs.Visuals:AddToggle("ItemVisual", {Title = "ESP Item", Default = false })    
     ItemVisual:OnChanged(function(Value)
         Options.ItemVisual.Value = Value
@@ -174,7 +325,7 @@ do
                 local CurrentCamera = Services.CurrentCamera
                 for i,v in pairs(workspace.Debris:GetChildren()) do
                     if v:IsA("Tool") then
-                        if Options.ItemVisual.Value then 
+                        if Options.ItemVisual.Value then
                             if not v:FindFirstChild('ItemESP') then
                                 local bill = Instance.new('BillboardGui',v)
                                 bill.Name = 'ItemESP'
@@ -585,16 +736,6 @@ do
             PlayerData.Humanoid.PlatformStand = false
             if bodyVelocity then bodyVelocity:Destroy() end
             if bodyGyro then bodyGyro:Destroy() end
-        end
-    end)
-
-    local Whitescreen = Tabs.Misc:AddToggle("Whitescreen", {Title = "Disable Rendering (White Screen)", Default = false })
-    Whitescreen:OnChanged(function()
-        local WS = Whitescreen.Value
-        if WS then
-            Services.RunService:Set3dRenderingEnabled(false)
-        else
-            Services.RunService:Set3dRenderingEnabled(true)
         end
     end)
 
