@@ -130,6 +130,7 @@ local Tabs = { -- https://lucide.dev/icons/
     Teleports = Window:AddTab({ Title = "Teleports", Icon = "map-pin" }),
     Misc = Window:AddTab({ Title = "Misc", Icon = "file-text" }),
 }
+
 local Options = Fluent.Options
 
 do
@@ -188,7 +189,8 @@ do
                     Services.RunService.Heartbeat:Wait(0.1)
                     ProximityPrompt:InputHoldEnd()
                     task.wait(0.5)
-                    PlayerData.HumanoidRootPart.CFrame = oldpos
+                    --PlayerData.HumanoidRootPart.CFrame = oldpos
+                    PlayerData.HumanoidRootPart:PivotTo(workspace.Wagon:GetPivot() + Vector3.new(1, 10, 1))
                 end
             end
         end
@@ -244,79 +246,45 @@ do
         end
     })
 
-    -- // Visuals Tab // --
-    local PlayerVisual = Tabs.Visuals:AddToggle("PlayerVisual", {Title = "ESP Players", Default = false })    
-    PlayerVisual:OnChanged(function(Value)
-        Options.PlayerVisual.Value = Value
-        spawn(function()
-            if Options.PlayerVisual.Value then
-                for _, player in pairs(game:GetService('Players'):GetPlayers()) do
-                    -- Ensure the player character exists and is loaded
-                    if PlayerData.LocalCharacter and PlayerData.LocalCharacter:FindFirstChild("HumanoidRootPart") then
-                        local HumanoidRootPart = PlayerData.LocalCharacter:FindFirstChild("HumanoidRootPart")
-    
-                        -- Create ESP highlight effect
-                        local highlight = Instance.new("Highlight")
-                        highlight.Parent = character
-                        highlight.Adornee = character
-                        highlight.FillColor = Color3.fromRGB(0, 255, 0) -- Green fill for players
-                        highlight.OutlineColor = Color3.fromRGB(255, 255, 255) -- White outline
-                        highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop -- Ensure it stays visible
-                        highlight.Enabled = true
-    
-                        -- Create BillboardGui for player name tag
-                        local billboardGui = Instance.new("BillboardGui")
-                        billboardGui.Parent = HumanoidRootPart
-                        billboardGui.Adornee = HumanoidRootPart
-                        billboardGui.Size = UDim2.new(6, 0, 1.5, 0) -- Default size for visibility
-                        billboardGui.StudsOffset = Vector3.new(0, 5, 0) -- Offset above the player
-                        billboardGui.AlwaysOnTop = true
-    
-                        -- Create TextLabel for player name
-                        local textLabel = Instance.new("TextLabel")
-                        textLabel.Parent = billboardGui
-                        textLabel.Size = UDim2.new(1, 0, 1, 0)
-                        textLabel.BackgroundTransparency = 1
-                        textLabel.Text = player.Name -- Display player's name
-                        textLabel.TextColor3 = Color3.fromRGB(255, 255, 255) -- White text
-                        textLabel.TextStrokeTransparency = 0 -- Add stroke for better visibility
-                        textLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0) -- Black stroke
-                        textLabel.Font = Enum.Font.GothamBold
-                        textLabel.TextScaled = true
-    
-                        -- Adjust the BillboardGui size based on distance from camera
-                        local camera = game.Workspace.CurrentCamera
-                        local dist = (camera.CFrame.Position - PlayerData.LocalCharacter.HumanoidRootPart.Position).Magnitude
-                        local scaleFactor = math.min(15, math.max(5, dist / 50)) -- Scale the size with distance, adjust as needed
-                        billboardGui.Size = UDim2.new(scaleFactor, 0, 3, 0) -- Keep it visible even from far distances
-    
-                        -- Force visibility for far distance players
-                        highlight.OutlineTransparency = 0.5 -- Increase outline transparency for far distance
-                        highlight.FillTransparency = 0.5 -- Increase fill transparency for far distance
-                    end
-                end
-            else
-                for _, player in pairs(game:GetService('Players'):GetPlayers()) do
-                    if PlayerData.LocalCharacter and PlayerData.LocalCharacter:FindFirstChild("HumanoidRootPart") then
-                        local HumanoidRootPart = PlayerData.LocalCharacter:FindFirstChild("HumanoidRootPart")
-    
-                        -- Remove Highlight
-                        local highlight = PlayerData.LocalCharacter:FindFirstChildOfClass("Highlight")
-                        if highlight then
-                            highlight:Destroy()
-                        end
-    
-                        -- Remove BillboardGui
-                        local billboardGui = HumanoidRootPart:FindFirstChildOfClass("BillboardGui")
-                        if billboardGui then
-                            billboardGui:Destroy()
-                        end
-                    end
+    local CollectCandy = Tabs.Main:AddButton({
+        Title = "Buy Jar",
+        Callback = function()
+            for i,v in pairs(workspace.MainPath:GetDescendants()) do
+                if v:IsA("Model") and v.Name == "Wanderer" then
+                    Dialog = v.HumanoidRootPart.ProximityPrompt
+                    Dialog.RequiresLineOfSight = false
+                    Dialog.HoldDuration = 0
+                    Dialog:InputHoldBegin()
+                    Services.RunService.Heartbeat:Wait(0.1)
+                    Dialog:InputHoldEnd()
+                    game:GetService("ReplicatedStorage").Remotes.Dialog:FireServer(1)
                 end
             end
-        end)
-    end)
+        end
+    })
 
+    local CollectCandy = Tabs.Main:AddButton({
+        Title = "Collect FireFly",
+        Callback = function()
+            for i,v in pairs(workspace.Debris:GetChildren()) do
+                if v:IsA("Model") and v:FindFirstChild('Common') or v:FindFirstChild('Rare') or v:FindFirstChild('Epic') then
+                    local cframeValue = v:GetPivot()
+                    local x = cframeValue.Position.X
+                    local y = cframeValue.Position.Y
+                    local z = cframeValue.Position.Z
+                    PlayerData.HumanoidRootPart:PivotTo(v:GetPivot())
+                    local arguments = {
+                        [1] = workspace[PlayerData.LocalPlayer.Name].Jar,
+                        [2] = "Activated",
+                        [3] = Vector3.new(x, y, z)
+                    }
+                    game:GetService("ReplicatedStorage").Remotes.Tools:FireServer(unpack(arguments))
+                end
+            end
+        end
+    })
+
+    -- // Visuals Tab // --
     local ItemVisual = Tabs.Visuals:AddToggle("ItemVisual", {Title = "ESP Item", Default = false })    
     ItemVisual:OnChanged(function(Value)
         Options.ItemVisual.Value = Value
@@ -324,6 +292,35 @@ do
             while Options.ItemVisual.Value == true do task.wait()
                 local CurrentCamera = Services.CurrentCamera
                 for i,v in pairs(workspace.Debris:GetChildren()) do
+                    if v:IsA("Tool") then
+                        if Options.ItemVisual.Value then
+                            if not v:FindFirstChild('ItemESP') then
+                                local bill = Instance.new('BillboardGui',v)
+                                bill.Name = 'ItemESP'
+                                bill.ExtentsOffset = Vector3.new(0, 1, 0)
+                                bill.Size = UDim2.new(1, 200, 1, 30)
+                                bill.Adornee = v
+                                bill.AlwaysOnTop = true
+                                local name = Instance.new('TextLabel', bill)
+                                name.Font = Enum.Font.GothamBold
+                                name.TextSize = 14
+                                name.TextWrapped = true
+                                name.Size = UDim2.new(1, 0, 1, 0)
+                                name.TextYAlignment = Enum.TextYAlignment.Top
+                                name.BackgroundTransparency = 1
+                                name.TextStrokeTransparency = 0.5
+                                name.TextColor3 = Color3.fromRGB(255, 100, 245)
+                            else
+                                v['ItemESP'].TextLabel.Text = v.Name
+                            end
+                        else
+                            if v:FindFirstChild('ItemESP') then
+                                v:FindFirstChild('ItemESP'):Destroy()
+                            end
+                        end
+                    end
+                end
+                for i,v in pairs(workspace.ItemsDropped:GetChildren()) do
                     if v:IsA("Tool") then
                         if Options.ItemVisual.Value then
                             if not v:FindFirstChild('ItemESP') then
