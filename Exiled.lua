@@ -150,30 +150,36 @@ do
     })
 
     --- << Main Tab >> ---
-    local FulbrightVisual = Tabs.Main:AddToggle("FulbrightVisual", {Title = "Full Bright", Default = false })
-    FulbrightVisual:OnChanged(function(Value)
-        Options.FulbrightVisual.Value = Value
-        spawn(function()
-            while Options.FulbrightVisual.Value == true do task.wait()
-                if Options.FulbrightVisual.Value then
-                    game:GetService("Lighting").Ambient = Color3.fromRGB(255, 255, 255)
-                    game:GetService("Lighting").Brightness = 10
-                    game:GetService("Lighting").FoggyAtmosphere.Density = 0
-                else
-                    game:GetService("Lighting").Ambient = Color3.fromRGB(70, 70, 70)
-                    game:GetService("Lighting").Brightness = 0.5
-                    game:GetService("Lighting").FoggyAtmosphere.Density = 0.8
-                end
+    local section = Tabs.Main:AddSection("Quick Teleports")
+    local TPWagon = Tabs.Main:AddButton({
+        Title = "Wagon Teleport",
+        Callback = function()
+            PlayerData.HumanoidRootPart:PivotTo(workspace.Wagon:GetPivot() + Vector3.new(1, 10, 1))
+        end
+    })
+    local TeleportSavePos = Tabs.Main:AddButton({
+        Title = "Teleport To Saved Position",
+        Description = "",
+        Callback = function()
+            if SavePos == "" then
+                Fluent:Notify({
+                    Title = "CupPink",
+                    Content = "No saved position found!",
+                    Duration = 3
+                })
+                return
+            else
+                PlayerData.LocalCharacter:FindFirstChild("HumanoidRootPart").CFrame = SavePos
             end
-        end)
-    end)
+        end
+    })
 
     local CollectItem = Tabs.Main:AddButton({
         Title = "Collect Item",
         Callback = function()
             local worldFolder = game.Workspace:FindFirstChild("Debris")
             if not worldFolder then
-                warn("world folder not found in Workspace")
+                warn("Debris not found in Workspace")
                 return
             end
             local oldpos = PlayerData.HumanoidRootPart.CFrame
@@ -190,7 +196,7 @@ do
                     ProximityPrompt:InputHoldEnd()
                     task.wait(0.5)
                     --PlayerData.HumanoidRootPart.CFrame = oldpos
-                    PlayerData.HumanoidRootPart:PivotTo(workspace.Wagon:GetPivot() + Vector3.new(1, 10, 1))
+                    PlayerData.HumanoidRootPart:PivotTo(workspace.Wagon:GetPivot() + Vector3.new(2, 10, 2))
                 end
             end
         end
@@ -201,7 +207,7 @@ do
         Callback = function()
             local worldFolder = game.Workspace:FindFirstChild("Debris")
             if not worldFolder then
-                warn("world folder not found in Workspace")
+                warn("Debris not found in Workspace")
                 return
             end
             local oldpos = PlayerData.HumanoidRootPart.CFrame
@@ -215,7 +221,8 @@ do
                     Services.RunService.Heartbeat:Wait(0.1)
                     ProximityPrompt:InputHoldEnd()
                     task.wait(0.5)
-                    PlayerData.HumanoidRootPart.CFrame = oldpos
+                    --PlayerData.HumanoidRootPart.CFrame = oldpos
+                    PlayerData.HumanoidRootPart:PivotTo(workspace.Wagon:GetPivot() + Vector3.new(2, 10, 2))
                 end
             end
         end
@@ -226,7 +233,7 @@ do
         Callback = function()
             local worldFolder = game.Workspace:FindFirstChild("Debris")
             if not worldFolder then
-                warn("world folder not found in Workspace")
+                warn("Debris not found in Workspace")
                 return
             end
             local oldpos = PlayerData.HumanoidRootPart.CFrame
@@ -240,7 +247,8 @@ do
                     Services.RunService.Heartbeat:Wait(0.1)
                     ProximityPrompt:InputHoldEnd()
                     task.wait(0.5)
-                    PlayerData.HumanoidRootPart.CFrame = oldpos
+                    --PlayerData.HumanoidRootPart.CFrame = oldpos
+                    PlayerData.HumanoidRootPart:PivotTo(workspace.Wagon:GetPivot() + Vector3.new(2, 10, 2))
                 end
             end
         end
@@ -266,6 +274,15 @@ do
     local CollectCandy = Tabs.Main:AddButton({
         Title = "Collect FireFly",
         Callback = function()
+            local jarcheck = workspace[PlayerData.LocalPlayer.Name].Jar
+            if not jarcheck then
+                Fluent:Notify({
+                    Title = "CupPink",
+                    Content = "Hold jar before use!",
+                    Duration = 5
+                })
+                return
+            end
             for i,v in pairs(workspace.Debris:GetChildren()) do
                 if v:IsA("Model") and v:FindFirstChild('Common') or v:FindFirstChild('Rare') or v:FindFirstChild('Epic') then
                     local cframeValue = v:GetPivot()
@@ -285,7 +302,7 @@ do
     })
 
     -- // Visuals Tab // --
-    local ItemVisual = Tabs.Visuals:AddToggle("ItemVisual", {Title = "ESP Item", Default = false })    
+    local ItemVisual = Tabs.Visuals:AddToggle("ItemVisual", {Title = "ESP Items", Default = false })    
     ItemVisual:OnChanged(function(Value)
         Options.ItemVisual.Value = Value
         spawn(function()
@@ -353,7 +370,7 @@ do
         end)
     end)
 
-    local MonterVisual = Tabs.Visuals:AddToggle("MonterVisual", {Title = "ESP Monter", Default = false })    
+    local MonterVisual = Tabs.Visuals:AddToggle("MonterVisual", {Title = "ESP Enemies", Default = false })
     MonterVisual:OnChanged(function(Value)
         Options.MonterVisual.Value = Value
         spawn(function()
@@ -394,7 +411,7 @@ do
         end)
     end)
 
-    local MerchantVisual = Tabs.Visuals:AddToggle("MerchantVisual", {Title = "ESP Merchant", Default = false })    
+    local MerchantVisual = Tabs.Visuals:AddToggle("MerchantVisual", {Title = "ESP NPCs", Default = false })    
     MerchantVisual:OnChanged(function(Value)
         Options.MerchantVisual.Value = Value
         spawn(function()
@@ -402,7 +419,7 @@ do
                 while Options.MerchantVisual.Value == true do task.wait()
                     local CurrentCamera = Services.CurrentCamera
                     for i,v in pairs(workspace.MainPath:GetDescendants()) do
-                        if v:IsA("Model") and v.Name == "Merchant" and v:FindFirstChild('HumanoidRootPart') then
+                        if v:IsA("Model") and v:FindFirstChild('HumanoidRootPart') then
                             if Options.MerchantVisual.Value then 
                                 if not v:FindFirstChild('MerchantESP') then
                                     local bill = Instance.new('BillboardGui',v)
@@ -421,34 +438,16 @@ do
                                     name.TextStrokeTransparency = 0.5
                                     name.TextColor3 = Color3.fromRGB(0, 255, 0)
                                 else
-                                    v['MerchantESP'].TextLabel.Text = v.Name
-                                end
-                            else
-                                if v:FindFirstChild('MerchantESP') then
-                                    v:FindFirstChild('MerchantESP'):Destroy()
-                                end
-                            end
-                        end
-                        if v:IsA("Model") and v.Name == "Hunter" and v:FindFirstChild('HumanoidRootPart') then
-                            if Options.MerchantVisual.Value then 
-                                if not v:FindFirstChild('MerchantESP') then
-                                    local bill = Instance.new('BillboardGui',v)
-                                    bill.Name = 'MerchantESP'
-                                    bill.ExtentsOffset = Vector3.new(0, 1, 0)
-                                    bill.Size = UDim2.new(1, 200, 1, 30)
-                                    bill.Adornee = v
-                                    bill.AlwaysOnTop = true
-                                    local name = Instance.new('TextLabel', bill)
-                                    name.Font = Enum.Font.GothamBold
-                                    name.TextSize = 14
-                                    name.TextWrapped = true
-                                    name.Size = UDim2.new(1, 0, 1, 0)
-                                    name.TextYAlignment = Enum.TextYAlignment.Top
-                                    name.BackgroundTransparency = 1
-                                    name.TextStrokeTransparency = 0.5
-                                    name.TextColor3 = Color3.fromRGB(0, 255, 0)
-                                else
-                                    v['MerchantESP'].TextLabel.Text = v.Name
+                                    if v.Name == "Merchant" then
+                                        v['MerchantESP'].TextLabel.Text = "Merchant"
+                                    end
+                                    if v.Name == "Hunter" then
+                                        v['MerchantESP'].TextLabel.Text = "Hunter"
+                                    end
+                                    if v.Name == "Wanderer" then
+                                        v['MerchantESP'].TextLabel.Text = "Wanderer"
+                                    end
+                                    --v['MerchantESP'].TextLabel.Text = v.Name
                                 end
                             else
                                 if v:FindFirstChild('MerchantESP') then
@@ -462,48 +461,7 @@ do
         end)
     end)
 
-    local WandererVisual = Tabs.Visuals:AddToggle("WandererVisual", {Title = "ESP Wanderer", Default = false })    
-    WandererVisual:OnChanged(function(Value)
-        Options.WandererVisual.Value = Value
-        spawn(function()
-            pcall(function()
-                while Options.WandererVisual.Value == true do task.wait()
-                    local CurrentCamera = Services.CurrentCamera
-                    for i,v in pairs(workspace.MainPath:GetDescendants()) do
-                        if v:IsA("Model") and v.Name == "Wanderer" then
-                            if Options.WandererVisual.Value then 
-                                if not v:FindFirstChild('WandererESP') then
-                                    local bill = Instance.new('BillboardGui',v)
-                                    bill.Name = 'WandererESP'
-                                    bill.ExtentsOffset = Vector3.new(0, 1, 0)
-                                    bill.Size = UDim2.new(1, 200, 1, 30)
-                                    bill.Adornee = v
-                                    bill.AlwaysOnTop = true
-                                    local name = Instance.new('TextLabel', bill)
-                                    name.Font = Enum.Font.GothamBold
-                                    name.TextSize = 14
-                                    name.TextWrapped = true
-                                    name.Size = UDim2.new(1, 0, 1, 0)
-                                    name.TextYAlignment = Enum.TextYAlignment.Top
-                                    name.BackgroundTransparency = 1
-                                    name.TextStrokeTransparency = 0.5
-                                    name.TextColor3 = Color3.fromRGB(0, 0, 255)
-                                else
-                                    v['WandererESP'].TextLabel.Text = v.Name
-                                end
-                            else
-                                if v:FindFirstChild('WandererESP') then
-                                    v:FindFirstChild('WandererESP'):Destroy()
-                                end
-                            end
-                        end
-                    end
-                end
-            end)
-        end)
-    end)
-
-    local FireFlyVisual = Tabs.Visuals:AddToggle("FireFlyVisual", {Title = "ESP FireFly", Default = false })    
+    local FireFlyVisual = Tabs.Visuals:AddToggle("FireFlyVisual", {Title = "ESP Fireflys", Default = false })    
     FireFlyVisual:OnChanged(function(Value)
         Options.FireFlyVisual.Value = Value
         spawn(function()
@@ -530,7 +488,16 @@ do
                                     name.TextStrokeTransparency = 0.5
                                     name.TextColor3 = Color3.fromRGB(0, 0, 255)
                                 else
-                                    v['FireFlyESP'].TextLabel.Text = "FireFly"
+                                    if v.Name == "Common" then
+                                        v['FireFlyESP'].TextLabel.Text = "Common"
+                                    end
+                                    if v.Name == "Rare" then
+                                        v['FireFlyESP'].TextLabel.Text = "Rare"
+                                    end
+                                    if v.Name == "Epic" then
+                                        v['FireFlyESP'].TextLabel.Text = "Epic"
+                                    end
+                                    --v['FireFlyESP'].TextLabel.Text = "FireFly"
                                 end
                             else
                                 if v:FindFirstChild('FireFlyESP') then
@@ -560,7 +527,7 @@ do
         Title = "Teleport To Saved Position",
         Description = "",
         Callback = function()
-            if SavePos == nil then
+            if SavePos == "" then
                 Fluent:Notify({
                     Title = "CupPink",
                     Content = "No saved position found!",
@@ -584,7 +551,7 @@ do
         Title = "Reset Saved Position",
         Description = "",
         Callback = function()
-            SavePos = nil
+            SavePos = ""
             SelectPosition:SetTitle("Position : N/A")
         end
     })
@@ -736,6 +703,34 @@ do
         end
     end)
 
+    local section = Tabs.Misc:AddSection("Misc")
+    local HoldDuration = Tabs.Misc:AddToggle("HoldDuration", {Title = "Hold Duration 0 sec", Default = false })
+    HoldDuration:OnChanged(function()
+        while Options.HoldDuration.Value == true do task.wait(1)
+            for i,v in ipairs(game:GetService("Workspace"):GetDescendants()) do
+                if v.ClassName == "ProximityPrompt" then
+                    v.HoldDuration = 0
+                end
+            end
+        end
+    end)
+    local FulbrightVisual = Tabs.Misc:AddToggle("FulbrightVisual", {Title = "Full Bright", Default = false })
+    FulbrightVisual:OnChanged(function(Value)
+        Options.FulbrightVisual.Value = Value
+        spawn(function()
+            while Options.FulbrightVisual.Value == true do task.wait()
+                if Options.FulbrightVisual.Value then
+                    game:GetService("Lighting").Ambient = Color3.fromRGB(255, 255, 255)
+                    game:GetService("Lighting").Brightness = 10
+                    game:GetService("Lighting").FoggyAtmosphere.Density = 0
+                else
+                    game:GetService("Lighting").Ambient = Color3.fromRGB(70, 70, 70)
+                    game:GetService("Lighting").Brightness = 0.5
+                    game:GetService("Lighting").FoggyAtmosphere.Density = 0.8
+                end
+            end
+        end)
+    end)
     Tabs.Misc:AddButton({
         Title = "Copy XYZ",
         Description = "Copy Clipboard",
